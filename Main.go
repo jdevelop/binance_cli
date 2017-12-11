@@ -10,7 +10,7 @@ import (
 	"os/user"
 	"time"
 
-	"github.com/jdevelop/binance-transfer/transfer"
+	"github.com/jdevelop/binance_cli/transfer"
 	"github.com/spf13/viper"
 )
 
