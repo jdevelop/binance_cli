@@ -29,6 +29,7 @@ func main() {
 	depList := flag.Bool("deposits", false, "List deposits")
 	wthList := flag.Bool("withdrawals", false, "List withdrawals")
 	status := flag.Bool("status", false, "User status")
+	force := flag.Bool("force", false, "Force deposit/withdrawal operation (DANGEROUS!)")
 
 	flag.Parse()
 
@@ -77,19 +78,26 @@ func main() {
 		}
 		fmt.Println(recs)
 	} else if *asset != "" && *dst != "" && *amount > 0 {
-		scanner := bufio.NewScanner(os.Stdin)
-		fmt.Printf("Are you sure you want to withdraw %.5f of %s to %s? (y/N) \n", *amount, *asset, *dst)
-		scanner.Scan()
-		switch scanner.Text() {
-		case "Y":
-			fallthrough
-		case "y":
+		withdraw := func() {
 			err := b.Withdraw(*asset, *dst, *amount)
 			if err != nil {
 				log.Fatal(err)
 			}
-		default:
-			fmt.Println("Transaction cancelled")
+		}
+		if *force {
+			withdraw()
+		} else {
+			scanner := bufio.NewScanner(os.Stdin)
+			fmt.Printf("Are you sure you want to withdraw %.5f of %s to %s? (y/N) \n", *amount, *asset, *dst)
+			scanner.Scan()
+			switch scanner.Text() {
+			case "Y":
+				fallthrough
+			case "y":
+				withdraw()
+			default:
+				fmt.Println("Transaction cancelled")
+			}
 		}
 	} else if *status {
 		s, err := b.Status()

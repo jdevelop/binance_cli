@@ -31,12 +31,14 @@ The configuration file has to be placed into `$HOME/.binance` and the content sh
 Available arguments:
 
 ```
-  -amount float
+ -amount float
         Amount (5 digits after decimal point) (default -1)
   -asset string
         Asset code (IOTA, ETH ...)
   -deposits
         List deposits
+  -force
+        Force deposit/withdrawal operation (DANGEROUS!)
   -status
         User status
   -wallet string
