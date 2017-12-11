@@ -153,6 +153,7 @@ func (ba *binance) Withdraw(asset Asset, address string, amt float64) (err error
 	ba.SignRequest(post)
 	resp, err := ba.client.Do(post)
 	if err != nil {
+		fmt.Println("Response: ", resp)
 		return
 	}
 	str, err := ioutil.ReadAll(resp.Body)
@@ -164,6 +165,7 @@ func (ba *binance) Withdraw(asset Asset, address string, amt float64) (err error
 
 	err = json.Unmarshal(str, &ws)
 	if err != nil {
+		fmt.Println("Can't parse response", string(str))
 		return
 	}
 

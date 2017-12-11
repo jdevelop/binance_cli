@@ -30,6 +30,8 @@ func main() {
 	wthList := flag.Bool("withdrawals", false, "List withdrawals")
 	status := flag.Bool("status", false, "User status")
 	force := flag.Bool("force", false, "Force deposit/withdrawal operation (DANGEROUS!)")
+	forceRetries := flag.Int("retries", 10, "Force retries on unsuccessful operation, should be used with -force")
+	retryInterval := flag.Duration("interval", 10*time.Minute, "Retry interval (1s = 1 second, 5m = 5 minutes, 1h = 1 hour)")
 
 	flag.Parse()
 
@@ -78,14 +80,33 @@ func main() {
 		}
 		fmt.Println(recs)
 	} else if *asset != "" && *dst != "" && *amount > 0 {
-		withdraw := func() {
+		withdraw := func() error {
 			err := b.Withdraw(*asset, *dst, *amount)
-			if err != nil {
-				log.Fatal(err)
+			if err == nil {
+				fmt.Println("Success!")
+			} else {
+				fmt.Println("Failed to withdraw ", err)
 			}
+			return err
 		}
 		if *force {
-			withdraw()
+			if *forceRetries > 0 {
+				if *retryInterval >= 1*time.Minute {
+					for i := 1; i <= *forceRetries; i++ {
+						fmt.Println("Attempt", i, "of", *forceRetries)
+						if err := withdraw(); err == nil {
+							return
+						}
+						if i != *forceRetries {
+							time.Sleep(*retryInterval)
+						}
+					}
+				} else {
+					log.Fatal("Interval must be > 1m")
+				}
+			} else {
+				withdraw()
+			}
 		} else {
 			scanner := bufio.NewScanner(os.Stdin)
 			fmt.Printf("Are you sure you want to withdraw %.5f of %s to %s? (y/N) \n", *amount, *asset, *dst)

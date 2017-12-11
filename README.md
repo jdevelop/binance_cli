@@ -31,21 +31,25 @@ The configuration file has to be placed into `$HOME/.binance` and the content sh
 Available arguments:
 
 ```
- -amount float
-        Amount (5 digits after decimal point) (default -1)
+Usage of binance_cli:
+  -amount float
+        Amount (5 digits after decimal point)
   -asset string
         Asset code (IOTA, ETH ...)
   -deposits
         List deposits
   -force
         Force deposit/withdrawal operation (DANGEROUS!)
+  -interval duration
+        Retry interval (5m = 5 minutes, 1h = 1 hour)
+  -retries int
+        Force retries on unsuccessful operation, should be used with -force
   -status
         User status
   -wallet string
         Destination wallet address
   -withdrawals
         List withdrawals
-
 ```
 
 Sample transfer of 1 IOTA to one of my wallets ( _if you don't mind to say "thanks" in this way_  ):
